@@ -1,0 +1,77 @@
+function buildCharts(sampleNames){
+    const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json"
+    d3.json(url).then(function(data){
+       let samples = data.samples;
+       let ResultArray = samples.filter((sampleDictionary) => sampleDictionary.id == sampleNames); 
+       let result = ResultArray[0];
+
+
+        let otuIDs = result.otu_ids;
+        let otuLabels = result.otu_labels;
+        let sampleValues = result.sample_values;
+
+        let bubbleLayout = {
+            title: "Bacteria Cultures Per Sample", 
+            margin: { t: 0},
+            hovermode: "closest",
+            xaxis: { title: "OTU ID"},
+            margin: { t: 30}
+        };
+        let bubbleData = [
+            {
+                x: otuIDs,
+                y: sampleValues,
+                text: otuLabels,
+                mode: "markers",
+                marker: {
+                    size: sampleValues,
+                    color: otuIDs,
+                    colorscale: "Earth"
+                }
+            }
+       ]
+
+       Plotly.newPlot("bubble", bubbleData, bubbleLayout);
+
+       let yticks = otuIDs.slice(0, 10).map(otuID => `OTU ${otuID}`).reverse();
+       let barData = [
+           {
+               y: yticks,
+               x: sampleValues.slice(0,10).reverse(),
+               text: otuLabels.slice(0, 10).reverse(),
+               type: "bar",
+               orientation: "h"
+           }
+       ]
+
+       let barLayout = {
+           title: "Top 10 Bacteria Cultures Found",
+           margin: { t: 30, l: 150}
+       }
+
+       Plotly.newPlot("bar", barData, barLayout)
+
+
+    });
+}
+function buildMetaData(){
+     
+}
+
+function init(){
+    let selector = d3.select("#selDataset");
+    const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json"
+    d3.json(url).then(function(data){
+        //console.log(data.names);
+        let sampleNames = data.names;
+        for(let i =0; i < sampleNames.length; i++){
+            selector.append("option").text(sampleNames[i]).property("value", sampleNames[i])
+        }
+      let firstSample = sampleNames[0];
+      buildCharts(firstSample)
+      buildMetaData(firstSample);  
+    });
+
+}
+
+init();
