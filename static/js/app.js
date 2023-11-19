@@ -54,8 +54,18 @@ function buildCharts(sampleNames){
 
     });
 }
-function buildMetaData(){
-     
+function buildMetaData(sample){
+    const url = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/14-Interactive-Web-Visualizations/02-Homework/samples.json"
+    d3.json(url).then(function(data){
+        let metadata = data.metadata;
+        let resultArray = metadata.filter(sampleDictionary => sampleDictionary.id == sample);
+        let result = resultArray[0];
+        let PANEL = d3.select("#sample-metadata");
+        PANEL.html("");
+        for(key in result) {
+            PANEL.append("h6").text(`${key.toUpperCase()}: ${result[key]}`)
+        }
+    })
 }
 
 function init(){
